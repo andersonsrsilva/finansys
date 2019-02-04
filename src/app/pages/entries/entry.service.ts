@@ -1,55 +1,37 @@
 import { Injectable, Injector } from '@angular/core';
-import { flatMap } from 'rxjs/operators';
-import { CategoryService } from '../categories/category.service';
-import { Entry } from './entry.model';
 import { Observable } from 'rxjs';
+import { flatMap, catchError} from 'rxjs/operators';
+import { Entry } from './entry.model';
 import { BaseResourceService } from '../../services/base-resource.service';
+import { CategoryService } from '../categories/category.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EntryService extends BaseResourceService<Entry> {
 
-  constructor(
-    protected injector: Injector,
-    private categoryService: CategoryService
-    ) {
-      super('api/entries', injector);
-    }
+  private categoryService: CategoryService;
 
+  constructor(protected injector: Injector) {
+    super('api/entries', injector, Entry.fromJson)
+    this.categoryService = injector.get(CategoryService);
+  }
 
   create(entry: Entry): Observable<Entry> {
-    return this.categoryService.getById(entry.categoryId).pipe(
-      flatMap(category => {
-        entry.category = category;
-
-        return super.create(entry);
-      })
-    );
+    return this.setCategoryAndSendToServer(entry, super.create.bind(this));
   }
 
   update(entry: Entry): Observable<Entry> {
+    return this.setCategoryAndSendToServer(entry, super.update.bind(this));
+  }
+
+  private setCategoryAndSendToServer(entry:Entry, sendFn: any): Observable<Entry> {
     return this.categoryService.getById(entry.categoryId).pipe(
       flatMap(category => {
         entry.category = category;
-
-        return super.update(entry);
-      })
+        return sendFn(entry);
+      }),
+      catchError(this.handleError)
     );
   }
-
-  protected jsonDataToEntries(jsonData: any[]): Entry[] {
-    const entries: Entry[] = [];
-    jsonData.forEach(element => {
-      const entry = Entry.fromJson(element);
-      entries.push(entry);
-    });
-    return entries;
-  }
-
-  protected jsonDataToEntry(jsonData: any): Entry {
-    return Entry.fromJson(jsonData);
-  }
-
-
 }
