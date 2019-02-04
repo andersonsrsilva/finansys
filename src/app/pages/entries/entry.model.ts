@@ -1,5 +1,5 @@
 import { Category } from '../categories/category.model';
-import { BaseResourceModel } from 'src/app/shared/models/base-resource.model';
+import { BaseResourceModel } from '../../shared/models/base-resource.model';
 
 export class Entry extends BaseResourceModel {
 
@@ -21,6 +21,10 @@ export class Entry extends BaseResourceModel {
     expense: 'Despesa',
     revenue: 'Receita'
   };
+
+  static fromJson(jsonData: any): Entry {
+    return Object.assign(new Entry(), jsonData);
+  }
 
   get paidText(): string {
     return this.paid ? 'Pago' : 'Pendente';

@@ -1,92 +1,55 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { catchError, flatMap, map } from 'rxjs/operators';
+import { Injectable, Injector } from '@angular/core';
+import { flatMap } from 'rxjs/operators';
 import { CategoryService } from '../categories/category.service';
 import { Entry } from './entry.model';
+import { Observable } from 'rxjs';
+import { BaseResourceService } from '../../services/base-resource.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class EntryService {
-
-  private apiPath = 'api/entries';
+export class EntryService extends BaseResourceService<Entry> {
 
   constructor(
-    private http: HttpClient,
+    protected injector: Injector,
     private categoryService: CategoryService
-    ) { }
+    ) {
+      super('api/entries', injector);
+    }
 
-  getAll(): Observable<Entry[]> {
-    return this.http.get(this.apiPath).pipe (
-      catchError(this.handleError),
-      map(this.jsonDataToEntries)
-    );
-  }
-
-  getById(id: number): Observable<Entry> {
-    const url = `${this.apiPath}/${id}`;
-
-    return this.http.get(url).pipe(
-      catchError(this.handleError),
-      map(this.jsonDataToEntry)
-    );
-  }
 
   create(entry: Entry): Observable<Entry> {
-    console.log('dfg');
     return this.categoryService.getById(entry.categoryId).pipe(
       flatMap(category => {
         entry.category = category;
 
-        return this.http.post(this.apiPath, entry).pipe(
-          catchError(this.handleError),
-          map(this.jsonDataToEntry)
-        );
+        return super.create(entry);
       })
     );
   }
 
   update(entry: Entry): Observable<Entry> {
-    const url = `${this.apiPath}/${entry.id}`;
-
     return this.categoryService.getById(entry.categoryId).pipe(
       flatMap(category => {
         entry.category = category;
 
-        return this.http.put(url, entry).pipe(
-          catchError(this.handleError),
-          map(() => entry)
-        );
+        return super.update(entry);
       })
     );
   }
 
-  delete(id: number): Observable<any> {
-    const url = `${this.apiPath}/${id}`;
-
-    return this.http.delete(url).pipe(
-      catchError(this.handleError),
-      map(() => null)
-    );
-  }
-
-  private jsonDataToEntries(jsonData: any[]): Entry[] {
+  protected jsonDataToEntries(jsonData: any[]): Entry[] {
     const entries: Entry[] = [];
     jsonData.forEach(element => {
-      const entry = Object.assign(new Entry, element);
+      const entry = Entry.fromJson(element);
       entries.push(entry);
     });
     return entries;
   }
 
-  private jsonDataToEntry(jsonData: any): Entry {
-    return jsonData as Entry;
+  protected jsonDataToEntry(jsonData: any): Entry {
+    return Entry.fromJson(jsonData);
   }
 
-  private handleError(error: any): Observable<any> {
-    console.log('ERRO NA REQUISIÇÂO => ', error);
-    return throwError(error);
-  }
 
 }
