@@ -1,5 +1,5 @@
-import { EntryService } from '../shared/entry.service';
-import { Entry } from './../shared/entry.model';
+import { EntryService } from '../entry.service';
+import { Entry } from '../entry.model';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
