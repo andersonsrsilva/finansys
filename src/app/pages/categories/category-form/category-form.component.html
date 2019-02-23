@@ -2,6 +2,8 @@
 
 <app-page-header [page-title]="pageTitle" button-text="Voltar" button-link="/categories" button-class="btn-light"></app-page-header>
 
+<app-server-message-error [server-error-messages]="serverErrorMessages"></app-server-message-error>
+
 <form [formGroup]="resourceForm" (submit)="submitForm()">
 
   <div class="card">
@@ -25,13 +27,6 @@
 
       </div>
     </div>
-  </div>
-
-  <div class="alert alert-danger mt-4" *ngIf="serverErrorMessages">
-    <strong>Erro no servidor</strong>
-    <ul>
-      <li *ngFor="let error of serverErrorMessages">{{ error }}</li>
-    </ul>
   </div>
 
   <button [disabled]="submittingForm || resourceForm.invalid" type="submit" class="btn btn-primary btn-lg float-right mt-3">Salvar</button>

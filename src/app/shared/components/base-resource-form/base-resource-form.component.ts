@@ -81,7 +81,7 @@ export abstract class BaseResourceFormComponent<T extends BaseResourceModel> imp
   }
 
   protected actionsForError(error) {
-    toasts.console.error('Ocorreu um erro ao processar sua solicitação.');
+    toasts.error('Ocorreu um erro ao processar sua solicitação.');
 
     this.submittingForm = false;
 
