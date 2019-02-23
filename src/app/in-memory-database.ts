@@ -19,7 +19,7 @@ export class InMemoryDatabase implements InMemoryDatabase {
         categoryId: categories[0].id,
         category: categories[0],
         paid: true,
-        date: '14/10/2018',
+        date: '14/10/2019',
         description: 'Pagamentos de contas da casa',
         type: 'expense',
         amount: '30,00'
@@ -30,7 +30,7 @@ export class InMemoryDatabase implements InMemoryDatabase {
         categoryId: categories[1].id,
         category: categories[1],
         paid: false,
-        date: '22/10/2018',
+        date: '22/09/2019',
         description: 'Pagamentos de conta de energia elétrica',
         type: 'revenue',
         amount: '30,00'
